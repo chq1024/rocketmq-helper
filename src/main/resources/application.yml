@@ -1,0 +1,6 @@
+server:
+  port: 30102
+
+spring:
+  application:
+    name: engine
