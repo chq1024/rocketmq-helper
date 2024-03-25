@@ -4,3 +4,37 @@ server:
 spring:
   application:
     name: engine
+
+
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    send-message-timeout: 10000
+    retry-times-when-send-failed: 2
+    retry-times-when-send-async-failed: 2
+    # 1024 * 1024 * 4  = 4M
+    max-message-size: 4194304
+    compress-message-body-threshold: 4096
+    retry-next-server: false
+  pull-consumer:
+    pull-batch-size: 20
+    message-model:
+
+
+mq:
+  topic:
+    comment:
+      topic: comment_topic
+    special:
+      topic: special_topic
+  product:
+    comment:
+      group: comment_product_group
+    special:
+      group: special_product_group
+  consumer:
+    comment:
+      group: comment_consumer_group
+    special:
+      group: special_consumer_group
+
