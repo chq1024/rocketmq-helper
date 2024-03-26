@@ -37,14 +37,18 @@ public class ConsumerHandlerMessage implements ApplicationRunner {
      */
     @SuppressWarnings("unchecked")
     public void run() {
-        while (loop) {
-            ConsumerTemplate template = (ConsumerTemplate) TemplateFactory.commentTemplate();
-            List<Map> receive = template.receive(Map.class);
-            for (Map map : receive) {
-                doIt(map);
+        Thread thread = new Thread(() -> {
+            while (loop) {
+                ConsumerTemplate template = (ConsumerTemplate) TemplateFactory.commentTemplate();
+                List<Map> receive = template.receive(Map.class);
+                for (Map map : receive) {
+                    doIt(map);
+                }
+                template.release();
             }
-            template.release();
-        }
+        });
+        thread.setDaemon(false);
+        thread.start();
     }
 
     public void doIt(Map<String, Object> msg) {
