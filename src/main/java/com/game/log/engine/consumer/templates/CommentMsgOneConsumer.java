@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct;
  * @author bk
  */
 @Service
-@ExtRocketMQConsumerConfiguration(nameServer = "${rocketmq.name-server}",instanceName = "commentMqConsumer",topic = "${mq.topic.comment}",group = "${mq.consumer.comment.group}")
 public class CommentMsgOneConsumer extends ConsumerTemplate {
 
     @PostConstruct
