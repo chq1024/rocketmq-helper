@@ -1,33 +1,24 @@
 package com.game.log.engine.consumer.templates;
 
-import com.game.log.engine.base.ConsumerTemplate;
-import com.game.log.engine.base.TemplateFactory;
-import com.game.log.engine.base.TemplateMappingEnum;
-import org.apache.rocketmq.spring.annotation.ExtRocketMQConsumerConfiguration;
+import com.game.log.engine.base.MsgBody;
+import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
+import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author bk
  */
 @Service
-@ExtRocketMQConsumerConfiguration(nameServer = "${rocketmq.name-server}",instanceName = "retryMqConsumer",topic = "${mq.topic.retry}",group = "${mq.consumer.retry.group}")
-public class RetryMsgConsumer extends ConsumerTemplate {
-
-    @PostConstruct
-    public void inited() {
-        register();
-    }
-
+@RocketMQMessageListener(topic = "${mq.topic.retry}",consumerGroup = "${mq.consumer.retry.group}",selectorExpression = "*",tlsEnable = "false",
+        delayLevelWhenNextConsume = 1,
+        maxReconsumeTimes = 3,
+        consumeThreadNumber = 2,
+        consumeThreadMax = 6)
+public class RetryMsgConsumer implements RocketMQListener<MsgBody> {
 
     @Override
-    public void register() {
-        TemplateFactory.regOrReleaseMqTemplate(TemplateMappingEnum.MSG_RETRY_MQ,this);
-    }
-
-    @Override
-    public void release() {
-        TemplateFactory.regOrReleaseMqTemplate(TemplateMappingEnum.MSG_RETRY_MQ,this);
+    public void onMessage(MsgBody message) {
+        // 处理发送重试后失败的消息
+        throw new RuntimeException("消费错误");
     }
 }

@@ -12,8 +12,8 @@ import javax.annotation.PostConstruct;
  * @author bk
  */
 @Service
-@ExtRocketMQConsumerConfiguration(nameServer = "${rocketmq.name-server}",instanceName = "commentOneMqConsumer",topic = "${mq.topic.comment}",group = "${mq.consumer.comment.group}")
-public class CommentMsgOneConsumer extends ConsumerTemplate {
+@ExtRocketMQConsumerConfiguration(nameServer = "${rocketmq.name-server}",instanceName = "commentTwoMqConsumer",topic = "${mq.topic.comment}",group = "${mq.consumer.comment.group}")
+public class CommentMsgTwoConsumer extends ConsumerTemplate {
 
     @PostConstruct
     public void inited() {
@@ -31,9 +31,8 @@ public class CommentMsgOneConsumer extends ConsumerTemplate {
         TemplateFactory.regOrReleaseMqTemplate(TemplateMappingEnum.MSG_COMMENT_MQ,this);
     }
 
-
     @Override
     public String getIdx() {
-        return "one";
+        return "two";
     }
 }

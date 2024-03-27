@@ -14,8 +14,6 @@ public class TemplateFactory {
 
     private static final ArrayBlockingQueue<ConsumerTemplate> CONSUMER_TRANSACTION_TEMPLATE = new ArrayBlockingQueue<>(1);
 
-    private static final ArrayBlockingQueue<ConsumerTemplate> CONSUMER_RETRY_TEMPLATE = new ArrayBlockingQueue<>(1);
-
     private static final ArrayBlockingQueue<ProducerTemplate> PRODUCT_TEMPLATE = new ArrayBlockingQueue<>(2);
 
     @SuppressWarnings("all")
@@ -26,8 +24,6 @@ public class TemplateFactory {
             CONSUMER_TRANSACTION_TEMPLATE.add((ConsumerTemplate) rocketMQTemplate);
         } else if (TemplateMappingEnum.PRODUCT_TEMPLATE.equals(tm)) {
             PRODUCT_TEMPLATE.add((ProducerTemplate) rocketMQTemplate);
-        } else if (TemplateMappingEnum.MSG_RETRY_MQ.equals(tm)){
-            CONSUMER_RETRY_TEMPLATE.add((ConsumerTemplate) rocketMQTemplate);
         } else {
             throw new RuntimeException("不支持此类型生产者");
         }
@@ -47,10 +43,6 @@ public class TemplateFactory {
         } catch (InterruptedException e) {
             throw new RuntimeException("Transaction消费者组忙碌中!");
         }
-    }
-
-    public static RocketMQTemplate retryTemplate() {
-        return CONSUMER_RETRY_TEMPLATE.poll();
     }
 
     public static ProducerTemplate producerTemplate() {

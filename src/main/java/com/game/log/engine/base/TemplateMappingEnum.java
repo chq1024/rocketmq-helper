@@ -23,12 +23,7 @@ public enum TemplateMappingEnum {
      * 事务消息
      */
     MSG_TRANSACTION_MQ("transactional"),
-
-
-    /**
-     * 二次重试消息
-     */
-    MSG_RETRY_MQ("retry");
+    ;
 
     private final String type;
 
