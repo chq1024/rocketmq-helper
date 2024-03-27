@@ -16,6 +16,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class MsgBody implements Serializable {
+
     private String msgId;
     // 用于对于消息组消息的适配，并更好用于ordered
     private String batchId;

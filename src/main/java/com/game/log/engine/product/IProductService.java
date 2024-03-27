@@ -1,4 +1,4 @@
-package com.game.log.engine.product.used;
+package com.game.log.engine.product;
 
 /**
  * @author bk

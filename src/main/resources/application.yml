@@ -5,35 +5,27 @@ spring:
   application:
     name: engine
 
-
-rocketmq:
-  name-server: 192.168.5.182:9876
-  producer:
-    send-message-timeout: 10000
-    retry-times-when-send-failed: 2
-    retry-times-when-send-async-failed: 2
-    # 1024 * 1024 * 4  = 4M
-#    max-message-size: 4194304
-#    compress-message-body-threshold: 4096
-    retry-next-server: false
-    group: comment_producer_group
-  pull-consumer:
-    pull-batch-size: 20
-    message-model: "CLUSTERING"
-    group: comment_consumer_group
-
-
 mq:
-  topic:
-    comment: comment_topic
-    transaction: transaction_topic
-    retry: retry_topic
-  consumer:
-    comment:
-      group: comment_consumer_group
-    transaction:
-      group: transaction_consumer_group
-    retry:
-      group: retry_topic_group
+  nameserver: 192.168.5.182:9872
+  enable-ssl: false
+  producer:
+    topics:
+      - "client-topic-A"
+      - "client-topic-B"
+    init-num: 2
+    max-attempts: 3
+  consumers:
+    one-consumer:
+      topic-tags:
+        - "client-topic-A:tagA:tagB"
+        - "client-topic-B:tagA:tagB"
+      thread-num: 3
+      group: "client-group"
+    two-consumer:
+      topic-tags:
+        - "client-topic-A:tagC:tagD"
+        - "client-topic-B:tagC:tagD"
+      thread-num: 3
+      group: "client-group"
 
 
