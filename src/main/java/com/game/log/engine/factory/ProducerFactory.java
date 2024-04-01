@@ -2,15 +2,14 @@ package com.game.log.engine.factory;
 
 import com.game.log.engine.base.MqProperties;
 import org.apache.rocketmq.client.apis.ClientConfiguration;
+import org.apache.rocketmq.client.apis.ClientException;
 import org.apache.rocketmq.client.apis.ClientServiceProvider;
 import org.apache.rocketmq.client.apis.producer.Producer;
+import org.apache.rocketmq.client.apis.producer.ProducerBuilder;
 import org.apache.rocketmq.client.apis.producer.TransactionChecker;
-import org.apache.rocketmq.client.java.impl.ClientServiceProviderImpl;
-import org.apache.rocketmq.client.java.impl.producer.ProducerBuilderImpl;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Nullable;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -18,7 +17,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  * @author bk
  */
 @Configuration
-public class ProducerFactory {
+public class ProducerFactory extends AbstractFactory {
 
     private final MqProperties mqProperties;
 
@@ -28,13 +27,13 @@ public class ProducerFactory {
         this.mqProperties = mqProperties;
     }
 
-    public Producer create(@Nullable TransactionChecker checker, String... topics) {
-        ClientServiceProvider provider = new ClientServiceProviderImpl();
+    public Producer create(@Nullable TransactionChecker checker, String... topics) throws ClientException {
+        ClientServiceProvider provider = ClientServiceProvider.loadService();
         ClientConfiguration configuration = ClientConfiguration.newBuilder()
                 .setEndpoints(mqProperties.getNameserver())
                 .enableSsl(mqProperties.getEnableSsl())
                 .build();
-        ProducerBuilderImpl producerBuilder = (ProducerBuilderImpl) provider.newProducerBuilder().setClientConfiguration(configuration).setTopics(topics).setMaxAttempts(2);
+        ProducerBuilder producerBuilder =  provider.newProducerBuilder().setClientConfiguration(configuration).setTopics(topics).setMaxAttempts(2);
         if (checker != null) {
             producerBuilder.setTransactionChecker(checker);
         }
@@ -55,7 +54,6 @@ public class ProducerFactory {
         producers.add(producer);
     }
 
-    @PreDestroy
     public void destroy() {
         for (Producer producer : producers) {
             try {

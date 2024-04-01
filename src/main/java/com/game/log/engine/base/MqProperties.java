@@ -42,15 +42,17 @@ public class MqProperties {
 
     @Data
     public static class ConsumerProperties {
+        private String type;
         private List<String> topicTags;
+        private Integer initNum;
         private Integer threadNum;
-        private String group;
         private Integer messageCount;
         private Integer messageSize;
+        private String listener;
 
         public ConsumerProperties() {
             this.threadNum = 3;
-            this.group = "DEFAULT-GROUP";
+            this.initNum = 1;
             this.messageCount = 1024;
             this.messageSize = 64 * 1024 * 1024;
         }
