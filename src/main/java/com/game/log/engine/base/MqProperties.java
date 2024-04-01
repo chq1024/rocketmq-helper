@@ -16,7 +16,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "mq")
 public class MqProperties {
 
-    private String nameserver;
+    private String proxy;
     private Boolean enableSsl;
     private ProducerProperties producer;
     private Map<String,ConsumerProperties> consumers;

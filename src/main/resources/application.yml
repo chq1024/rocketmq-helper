@@ -6,28 +6,28 @@ spring:
     name: engine
 
 mq:
-  nameserver: 192.168.5.182:9876
+  proxy: 192.168.5.182:8081
   enable-ssl: false
   producer:
     topics:
-      - "client-topic-A"
-      - "client-topic-B"
+      - "client_topic_A"
+      - "client_topic_B"
     init-num: 2
     max-attempts: 3
   consumers:
     client-group-one:
       type: simple
       topic-tags:
-        - "client-topic-A:tagA:tagB"
-        - "client-topic-B:tagA:tagB"
+        - "client_topic_A:tagA:tagB"
+        - "client_topic_B:tagA:tagB"
       thread-num: 3
       init-num: 2
     client-group-two:
       type: push
       topic-tags:
-        - "client-topic-A:tagC:tagD"
-        - "client-topic-B:tagC:tagD"
+        - "client_topic_A:tagC:tagD"
+        - "client_topic_B:tagC:tagD"
       thread-num: 3
-      listener: com.game.log.engine.consumer.listener.ClientGroupTwoMessageListener
+      listener: com.game.log.engine.consumer.push.ClientGroupTwoMessageListener
 
 

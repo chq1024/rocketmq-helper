@@ -21,16 +21,17 @@ public class ProducerFactory extends AbstractFactory {
 
     private final MqProperties mqProperties;
 
-    private final ArrayBlockingQueue<Producer> producers = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Producer> producers;
 
     ProducerFactory(MqProperties mqProperties) {
         this.mqProperties = mqProperties;
+        this.producers = new ArrayBlockingQueue<>(mqProperties.getProducer().getInitNum());
     }
 
     public Producer create(@Nullable TransactionChecker checker, String... topics) throws ClientException {
         ClientServiceProvider provider = ClientServiceProvider.loadService();
         ClientConfiguration configuration = ClientConfiguration.newBuilder()
-                .setEndpoints(mqProperties.getNameserver())
+                .setEndpoints(mqProperties.getProxy())
                 .enableSsl(mqProperties.getEnableSsl())
                 .build();
         ProducerBuilder producerBuilder =  provider.newProducerBuilder().setClientConfiguration(configuration).setTopics(topics).setMaxAttempts(2);

@@ -39,7 +39,7 @@ public class SimpleConsumerFactory extends AbstractFactory {
     public SimpleConsumer create(List<String> expressions, String consumerGroup, Integer awaitSecond) throws ClientException {
         ClientServiceProvider provider = new ClientServiceProviderImpl();
         ClientConfiguration configuration = ClientConfiguration.newBuilder()
-                .setEndpoints(mqProperties.getNameserver())
+                .setEndpoints(mqProperties.getProxy())
                 .enableSsl(mqProperties.getEnableSsl())
                 .build();
 
