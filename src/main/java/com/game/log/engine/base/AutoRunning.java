@@ -22,7 +22,7 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties(MqProperties.class)
 @Order(1)
-public class RunningInitProcess implements ApplicationRunner {
+public class AutoRunning implements ApplicationRunner {
 
     private final MqProperties mqProperties;
 
@@ -32,7 +32,7 @@ public class RunningInitProcess implements ApplicationRunner {
 
     private final PushConsumerFactory pushConsumerFactory;
 
-    public RunningInitProcess(MqProperties mqProperties,ProducerFactory producerFactory,PushConsumerFactory pushConsumerFactory,SimpleConsumerFactory simpleConsumerFactory) {
+    public AutoRunning(MqProperties mqProperties,ProducerFactory producerFactory,PushConsumerFactory pushConsumerFactory,SimpleConsumerFactory simpleConsumerFactory) {
         this.mqProperties = mqProperties;
         this.producerFactory = producerFactory;
         this.pushConsumerFactory = pushConsumerFactory;
@@ -42,12 +42,7 @@ public class RunningInitProcess implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // 1. 加载producer
-        MqProperties.ProducerProperties producer = mqProperties.getProducer();
-        Integer initNum = producer.getInitNum();
-        List<String> topics = producer.getTopics();
-        for (int i = 0; i < initNum; i++) {
-            producerFactory.create(null, topics.toArray(new String[0]));
-        }
+        producerFactory.create(mqProperties.getProxy(),mqProperties.getEnableSsl(),mqProperties.getProducer());
         // 2. 加载consumer
         Map<String, MqProperties.ConsumerProperties> consumers = mqProperties.getConsumers();
         for (String consumerGroup : consumers.keySet()) {

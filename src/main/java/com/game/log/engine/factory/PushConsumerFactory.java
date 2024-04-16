@@ -43,7 +43,6 @@ public class PushConsumerFactory extends AbstractFactory {
                 .setMaxCacheMessageCount(1024)
                 .setMaxCacheMessageSizeInBytes(64 * 1024 * 1024)
                 .build();
-
         pushConsumers.add(pushConsumer);
     }
 

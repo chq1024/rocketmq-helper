@@ -29,13 +29,12 @@ public class MqProperties {
     @Data
     public static class ProducerProperties {
         private String namespace;
-        private Integer initNum;
         private Integer maxAttempts;
-        private List<String> topics;
+        private Map<String,TopicProperties> topics;
+        private String checker;
 
         public ProducerProperties() {
             this.namespace = "DEFAULT-NAME-SPACE";
-            this.initNum = 1;
             this.maxAttempts = 3;
         }
     }
@@ -44,7 +43,6 @@ public class MqProperties {
     public static class ConsumerProperties {
         private String type;
         private List<String> topicTags;
-        private Integer initNum;
         private Integer threadNum;
         private Integer messageCount;
         private Integer messageSize;
@@ -52,9 +50,17 @@ public class MqProperties {
 
         public ConsumerProperties() {
             this.threadNum = 3;
-            this.initNum = 1;
             this.messageCount = 1024;
             this.messageSize = 64 * 1024 * 1024;
+        }
+    }
+
+    @Data
+    public static class TopicProperties {
+        private Boolean isTrans;
+
+        public TopicProperties() {
+            this.isTrans = false;
         }
     }
 }

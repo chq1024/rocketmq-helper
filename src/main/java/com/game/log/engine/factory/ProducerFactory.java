@@ -8,10 +8,16 @@ import org.apache.rocketmq.client.apis.producer.Producer;
 import org.apache.rocketmq.client.apis.producer.ProducerBuilder;
 import org.apache.rocketmq.client.apis.producer.TransactionChecker;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bk
@@ -19,45 +25,44 @@ import java.util.concurrent.ArrayBlockingQueue;
 @Configuration
 public class ProducerFactory extends AbstractFactory {
 
-    private final MqProperties mqProperties;
+    private final ConcurrentHashMap<String, Producer> producers = new ConcurrentHashMap<>();
 
-    private final ArrayBlockingQueue<Producer> producers;
-
-    ProducerFactory(MqProperties mqProperties) {
-        this.mqProperties = mqProperties;
-        this.producers = new ArrayBlockingQueue<>(mqProperties.getProducer().getInitNum());
-    }
-
-    public Producer create(@Nullable TransactionChecker checker, String... topics) throws ClientException {
+    public void create(String proxy, Boolean enableSsl, MqProperties.ProducerProperties properties) {
         ClientServiceProvider provider = ClientServiceProvider.loadService();
         ClientConfiguration configuration = ClientConfiguration.newBuilder()
-                .setEndpoints(mqProperties.getProxy())
-                .enableSsl(mqProperties.getEnableSsl())
+                .setEndpoints(proxy)
+                .enableSsl(enableSsl)
                 .build();
-        ProducerBuilder producerBuilder =  provider.newProducerBuilder().setClientConfiguration(configuration).setTopics(topics).setMaxAttempts(2);
-        if (checker != null) {
-            producerBuilder.setTransactionChecker(checker);
+        Map<String, MqProperties.TopicProperties> topicsMap = properties.getTopics();
+        if (topicsMap.isEmpty()) {
+            throw new RuntimeException("请先配置product.topics属性");
         }
-        Producer producer = producerBuilder.build();
-        producers.add(producer);
-        return producer;
-    }
-
-    public Producer get() {
+        Set<String> topics = topicsMap.keySet();
+        ProducerBuilder producerBuilder = provider.newProducerBuilder().setClientConfiguration(configuration).setTopics(topics.toArray(new String[0])).setMaxAttempts(2);
+        if (StringUtils.hasText(properties.getChecker())) {
+            String checker = properties.getChecker();
+            try {
+                Class<?> transactionCheckerClazz = Class.forName(checker);
+                TransactionChecker transactionChecker = (TransactionChecker) transactionCheckerClazz.getDeclaredConstructor().newInstance();
+                producerBuilder.setTransactionChecker(transactionChecker);
+            } catch (Exception e) {
+                throw new RuntimeException("product.checker属性配置异常");
+            }
+        }
         try {
-            return producers.take();
-        } catch (InterruptedException e) {
+            Producer producer = producerBuilder.build();
+            for (String topic : topics) {
+                producers.put(topic,producer);
+            }
+        } catch (ClientException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void release(Producer producer) {
-        producers.add(producer);
-    }
-
     public void destroy() {
-        for (Producer producer : producers) {
+        for (Producer producer : producers.values()) {
             try {
+                // TODO 会被重复关闭
                 producer.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);

@@ -15,7 +15,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class MsgBody implements Serializable {
+public class Message implements Serializable {
 
     private String msgId;
     // 用于对于消息组消息的适配，并更好用于ordered
@@ -29,11 +29,11 @@ public class MsgBody implements Serializable {
     // 消息重试消费次数，如果超过了定义的次数，可持久化到数据库
     private Integer retry;
 
-    public MsgBody() {
+    public Message() {
         this(1L,0);
     }
 
-    public MsgBody(Long ordered,Integer retry) {
+    public Message(Long ordered,Integer retry) {
         this.msgId = IdHelper.msgId();
         this.createTime = DateUtil.timestamp();
         this.ordered = ordered;
