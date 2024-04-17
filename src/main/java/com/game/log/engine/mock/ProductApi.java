@@ -1,4 +1,4 @@
-package com.game.log.engine.product;
+package com.game.log.engine.mock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

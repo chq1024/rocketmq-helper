@@ -1,4 +1,4 @@
-package com.game.log.engine.base;
+package com.game.log.engine.conf;
 
 import lombok.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -46,12 +46,15 @@ public class MqProperties {
         private Integer threadNum;
         private Integer messageCount;
         private Integer messageSize;
-        private String listener;
+        private Integer awaitSeconds;
+        private Integer receiveNum;
+        private Integer invisibleSeconds;
 
         public ConsumerProperties() {
             this.threadNum = 3;
             this.messageCount = 1024;
             this.messageSize = 64 * 1024 * 1024;
+            this.awaitSeconds = 5;
         }
     }
 

@@ -1,19 +1,11 @@
-package com.game.log.engine.product;
+package com.game.log.engine.mock;
 
-import com.game.log.engine.base.Message;
-import com.game.log.engine.factory.ProducerFactory;
-import com.game.log.engine.utils.IdHelper;
-import com.game.log.engine.utils.TransformUtil;
+import com.game.log.engine.ab.factory.ProducerFactory;
+import com.game.log.engine.conf.MqMessage;
 import org.apache.rocketmq.client.apis.ClientException;
-import org.apache.rocketmq.client.apis.message.MessageBuilder;
 import org.apache.rocketmq.client.apis.producer.Producer;
 import org.apache.rocketmq.client.apis.producer.SendReceipt;
-import org.apache.rocketmq.client.java.message.MessageBuilderImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author bk
@@ -21,32 +13,16 @@ import java.util.Map;
 @Service
 public class ProductServiceImpl implements IProductService {
 
-    @Autowired
-    private ProducerFactory factory;
 
     @Override
     public void send() {
-        Producer producer = factory.get();
 
-        Message msgBody = new Message();
-        msgBody.setMsgId(IdHelper.msgId());
-        msgBody.setBatchId("-");
-        msgBody.setUid(10001L);
-        msgBody.setAction("GameSystem");
-        Map<String,Object> body = new HashMap<>();
-        body.put("before",10);
-        body.put("after",11);
-        msgBody.setBody(body);
 
-        MessageBuilder messageBuilder = new MessageBuilderImpl();
-
-        messageBuilder.setBody(TransformUtil.toByteArray(msgBody));
-        messageBuilder.setKeys("");
-
-        messageBuilder.setTag("");
-        messageBuilder.setTopic("");
+        MqMessage.builder()
 
         try {
+            Producer producer = ProducerFactory.instance().get("send");
+            producer.send()
             SendReceipt send = producer.send(messageBuilder.build());
         } catch (ClientException e) {
             throw new RuntimeException(e);
@@ -62,6 +38,5 @@ public class ProductServiceImpl implements IProductService {
 //                System.out.println("丢入数据库~");
 //            }
 //        }
-        factory.release(producer);
     }
 }

@@ -1,12 +1,15 @@
-package com.game.log.engine.consumer.push;
+package com.game.log.engine.ab.consumer;
 
+import com.game.log.engine.anno.ConsumerListener;
 import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
+import org.apache.rocketmq.client.apis.consumer.MessageListener;
 import org.apache.rocketmq.client.apis.message.MessageView;
 
 /**
  * @author bk
  */
-public class ClientGroupTwoMessageListener extends AbstractListener {
+@ConsumerListener(groupName = "push_consumer_group")
+public class PushConsumerGroupListener implements MessageListener {
 
     @Override
     public ConsumeResult consume(MessageView messageView) {

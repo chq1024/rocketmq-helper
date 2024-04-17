@@ -1,4 +1,4 @@
-package com.game.log.engine.product;
+package com.game.log.engine.mock;
 
 /**
  * @author bk

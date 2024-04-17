@@ -19,14 +19,20 @@ mq:
     max-attempts: 3
   consumers:
     # 消费者组名称
-    simple_consumers_group_one:
+    simple_consumers_group:
       # 消费者类型 simple\push\pull
       type: simple
       # 监听topic和tags
       topic-tags:
         - "client_topic_A:tagA:tagB"
         - "client_topic_B:tagA:tagB"
-    push_consumers_group_one:
+      # 轮询时间
+      await-seconds: 5
+      # 不可见时间
+      invisible-seconds: 3
+      # 每次拉取消息条数
+      receive-num: 30
+    push_consumers_group:
       # 消费者类型 simple\push\pull
       type: push
       # 监听topic和tags
@@ -35,7 +41,5 @@ mq:
         - "client_topic_B:tagC:tagD"
       # 消息消费的线程组数量，即消费者组消费者数量（只用于push类型的消费者组）
       thread-num: 3
-      # 指定消息监听处理类 （只用于push类型的消费者组）
-      listener: com.game.log.engine.consumer.push.ClientGroupTwoMessageListener
 
 
