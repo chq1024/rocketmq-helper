@@ -9,7 +9,7 @@ import java.time.ZoneOffset;
 public class DateUtil {
 
     public static long timestamp() {
-        return timestamp(LocalDateTime.now());
+        return timestamp(LocalDateTime.now(ZoneOffset.of("+8")));
     }
 
     private static long timestamp(LocalDateTime dateTime) {

@@ -55,6 +55,8 @@ public class MqProperties {
             this.messageCount = 1024;
             this.messageSize = 64 * 1024 * 1024;
             this.awaitSeconds = 5;
+            //消费不可见时间指的是消息处理+失败后重试间隔的总时长
+            this.invisibleSeconds = 10;
         }
     }
 

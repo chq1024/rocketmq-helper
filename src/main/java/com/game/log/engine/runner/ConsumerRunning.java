@@ -49,6 +49,7 @@ public class ConsumerRunning implements ApplicationRunner {
                         MessageHandler handler = MessageFactory.handler().get(group);
                         for (MessageView messageView : receive) {
                             handler.handler(messageView);
+                            consumer.ack(messageView);
                         }
                     } catch (ClientException e) {
                         throw new RuntimeException(e);

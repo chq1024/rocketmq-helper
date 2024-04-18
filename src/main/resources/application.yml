@@ -4,6 +4,20 @@ server:
 spring:
   application:
     name: engine
+  redis:
+    client-type: lettuce
+    host: localhost
+    port: 6380
+    password:
+    database: 1
+    lettuce:
+      pool:
+        max-idle: 8
+        min-idle: 1
+        max-active: 8
+        max-wait: -1ms
+      shutdown-timeout: 10000ms
+    timeout: 60000ms
 
 mq:
   proxy: 192.168.5.182:8081
@@ -14,7 +28,7 @@ mq:
         is_trans: false
       log_transaction_topic:
         is_trans: true
-    checker: com.game.log.engine.MyTransactionChecker
+    checker: com.game.log.engine.ab.producer.MyTransactionalChecker
     #最大内部重试次数
     max-attempts: 3
   consumers:
@@ -24,12 +38,12 @@ mq:
       type: simple
       # 监听topic和tags
       topic-tags:
-        - "client_topic_A:tagA:tagB"
-        - "client_topic_B:tagA:tagB"
+        - "log_comment_topic:*"
+        - "log_transaction_topic:*"
       # 轮询时间
       await-seconds: 5
-      # 不可见时间
-      invisible-seconds: 3
+      # 消费不可见时间指的是消息处理+失败后重试间隔的总时长
+      invisible-seconds: 10
       # 每次拉取消息条数
       receive-num: 30
     push_consumers_group:
@@ -37,8 +51,8 @@ mq:
       type: push
       # 监听topic和tags
       topic-tags:
-        - "client_topic_A:tagC:tagD"
-        - "client_topic_B:tagC:tagD"
+        - "log_comment_topic:*"
+        - "log_transaction_topic:*"
       # 消息消费的线程组数量，即消费者组消费者数量（只用于push类型的消费者组）
       thread-num: 3
 

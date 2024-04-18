@@ -5,7 +5,17 @@ import com.game.log.engine.ab.factory.*;
 import com.game.log.engine.anno.ConsumerHandler;
 import com.game.log.engine.anno.ConsumerListener;
 import com.game.log.engine.conf.MqProperties;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.rocketmq.client.apis.consumer.MessageListener;
+import org.apache.rocketmq.common.MixAll;
+import org.apache.rocketmq.common.filter.impl.Op;
+import org.apache.rocketmq.srvutil.ServerUtil;
+import org.apache.rocketmq.tools.admin.MQAdminUtils;
+import org.apache.rocketmq.tools.command.SubCommandException;
+import org.apache.rocketmq.tools.command.topic.UpdateTopicSubCommand;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,6 +28,7 @@ import org.springframework.lang.NonNull;
 
 import javax.annotation.PreDestroy;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author bk
@@ -37,6 +48,32 @@ public class AutoRunning implements ApplicationRunner, ApplicationContextAware {
 
     @Override
     public void run(ApplicationArguments args) {
+        // 0. 手动创建主题
+        Map<String, MqProperties.TopicProperties> topics = mqProperties.getProducer().getTopics();
+        System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, "192.168.5.182:9876");
+        Set<String> topicsNames = topics.keySet();
+        for (String topicsName : topicsNames) {
+            UpdateTopicSubCommand command = new UpdateTopicSubCommand();
+            String[] params = new String[] {
+                    "-b 192.168.5.182:10911",
+                    "-t " + topicsName,
+                    "-o " + true,
+                    "-n 192.168.5.182:9876",
+                    "-r 3",
+                    "-w 3",
+                    "-p 6",
+                    "-a +message.type=FIFO",
+            };
+            Options options = ServerUtil.buildCommandlineOptions(new Options());
+            final Options updateTopicOptions = command.buildCommandlineOptions(options);
+            CommandLine mqadmin = ServerUtil.parseCmdLine("mqadmin", params, updateTopicOptions, new PosixParser());
+            try {
+                command.execute(mqadmin,updateTopicOptions,null);
+            } catch (SubCommandException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // 0. 根据注解加载messageHandler和messageListener
         Map<String, Object> handlersMap = context.getBeansWithAnnotation(ConsumerHandler.class);
         for (Object value : handlersMap.values()) {

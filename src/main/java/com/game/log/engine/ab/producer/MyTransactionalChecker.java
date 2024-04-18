@@ -11,6 +11,7 @@ public class MyTransactionalChecker implements TransactionChecker {
 
     @Override
     public TransactionResolution check(MessageView messageView) {
+
         return null;
     }
 }

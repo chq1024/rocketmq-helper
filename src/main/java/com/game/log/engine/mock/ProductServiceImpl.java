@@ -1,11 +1,15 @@
 package com.game.log.engine.mock;
 
 import com.game.log.engine.ab.factory.ProducerFactory;
-import com.game.log.engine.conf.MqMessage;
+import com.game.log.engine.conf.LogTableEnum;
 import org.apache.rocketmq.client.apis.ClientException;
+import org.apache.rocketmq.client.apis.message.Message;
 import org.apache.rocketmq.client.apis.producer.Producer;
 import org.apache.rocketmq.client.apis.producer.SendReceipt;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author bk
@@ -13,30 +17,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductServiceImpl implements IProductService {
 
-
     @Override
     public void send() {
+        Map<String,Object> content = new HashMap<>();
+        content.put("uid",10001);
+        content.put("card_id",20003);
+        content.put("rate",1);
 
-
-        MqMessage.builder()
-
+        Message message = LogTableEnum.GACHA_CARD_LOG.mqMessage(content).transform();
         try {
-            Producer producer = ProducerFactory.instance().get("send");
-            producer.send()
-            SendReceipt send = producer.send(messageBuilder.build());
+            Producer producer = ProducerFactory.instance().get(LogTableEnum.GACHA_CARD_LOG.getTopic());
+            SendReceipt send = producer.send(message);
+            System.out.println("消息:" + send.getMessageId() + "被消费");
         } catch (ClientException e) {
             throw new RuntimeException(e);
         }
-//        SendResult sendResult = producer.syncSend("comment_topic:sync_send", message);
-//
-//        if (!SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
-//            System.out.println("消息发送失败！");
-//            // 自动重复发送后依然错误的数据，进入另一个topic去延迟消费消费
-//            SendResult retrySendResult = producer.syncSendDelayTimeMills("retry_topic", message, 3000);
-//            if (!SendStatus.SEND_OK.equals(retrySendResult.getSendStatus())) {
-//                // 丢入到数据库
-//                System.out.println("丢入数据库~");
-//            }
-//        }
     }
 }
