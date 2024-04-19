@@ -5,15 +5,13 @@ import com.game.log.engine.ab.factory.*;
 import com.game.log.engine.anno.ConsumerHandler;
 import com.game.log.engine.anno.ConsumerListener;
 import com.game.log.engine.conf.MqProperties;
+import com.game.log.engine.utils.CacheUtil;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.rocketmq.client.apis.consumer.MessageListener;
 import org.apache.rocketmq.common.MixAll;
-import org.apache.rocketmq.common.filter.impl.Op;
 import org.apache.rocketmq.srvutil.ServerUtil;
-import org.apache.rocketmq.tools.admin.MQAdminUtils;
 import org.apache.rocketmq.tools.command.SubCommandException;
 import org.apache.rocketmq.tools.command.topic.UpdateTopicSubCommand;
 import org.springframework.beans.BeansException;
@@ -28,9 +26,10 @@ import org.springframework.lang.NonNull;
 
 import javax.annotation.PreDestroy;
 import java.util.Map;
-import java.util.Set;
 
 /**
+ * 本类用于创建主题、生产者、消费者
+ * 配置消费者监听、处理类
  * @author bk
  */
 @Configuration
@@ -48,27 +47,30 @@ public class AutoRunning implements ApplicationRunner, ApplicationContextAware {
 
     @Override
     public void run(ApplicationArguments args) {
-        // 0. 手动创建主题
+        // -1. 自动创建主题，且自动修改主题配置
         Map<String, MqProperties.TopicProperties> topics = mqProperties.getProducer().getTopics();
-        System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, "192.168.5.182:9876");
-        Set<String> topicsNames = topics.keySet();
-        for (String topicsName : topicsNames) {
+        System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, mqProperties.getNameAddr());
+        for (Map.Entry<String, MqProperties.TopicProperties> entry : topics.entrySet()) {
+            String topicName = entry.getKey();
+            MqProperties.TopicProperties topicConfig = entry.getValue();
             UpdateTopicSubCommand command = new UpdateTopicSubCommand();
             String[] params = new String[] {
-                    "-b 192.168.5.182:10911",
-                    "-t " + topicsName,
-                    "-o " + true,
-                    "-n 192.168.5.182:9876",
+                    "-c " + mqProperties.getClusterName(),
+                    "-t " + topicName,
+                    "-o " + topicConfig.getOrder(),
+                    "-n " + mqProperties.getNameAddr(),
                     "-r 3",
                     "-w 3",
                     "-p 6",
-                    "-a +message.type=FIFO",
+                    "-a +message.type=" + topicConfig.getType().toUpperCase(),
             };
             Options options = ServerUtil.buildCommandlineOptions(new Options());
             final Options updateTopicOptions = command.buildCommandlineOptions(options);
+            // 切勿将PosixParser修改为DefaultParser，DefaultParser无法解析-a属性值
             CommandLine mqadmin = ServerUtil.parseCmdLine("mqadmin", params, updateTopicOptions, new PosixParser());
             try {
                 command.execute(mqadmin,updateTopicOptions,null);
+                CacheUtil.setTmtCache(topicName,topicConfig.getType());
             } catch (SubCommandException e) {
                 throw new RuntimeException(e);
             }

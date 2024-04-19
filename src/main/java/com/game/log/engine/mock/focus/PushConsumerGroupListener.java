@@ -1,4 +1,4 @@
-package com.game.log.engine.ab.consumer;
+package com.game.log.engine.mock.focus;
 
 import com.game.log.engine.anno.ConsumerListener;
 import org.apache.rocketmq.client.apis.consumer.ConsumeResult;

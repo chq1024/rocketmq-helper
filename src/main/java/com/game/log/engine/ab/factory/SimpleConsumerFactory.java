@@ -60,7 +60,7 @@ public class SimpleConsumerFactory extends AbFactory<SimpleConsumer> {
             for (Map.Entry<String, MqProperties.ConsumerProperties> config : consumers.entrySet()) {
                 String consumerGroupName = config.getKey();
                 MqProperties.ConsumerProperties consumerConfig = config.getValue();
-                if (!MqConst.CONSUMER_SIMPLE.equals(consumerConfig.getType())) {
+                if (!MqConst.CONSUMER_SIMPLE.equalsIgnoreCase(consumerConfig.getType())) {
                     continue;
                 }
                 SimpleConsumer simpleConsumer = provider.newSimpleConsumerBuilder()

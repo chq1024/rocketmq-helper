@@ -1,4 +1,4 @@
-package com.game.log.engine.ab.consumer;
+package com.game.log.engine.mock.focus;
 
 import com.game.log.engine.ab.MessageHandler;
 import com.game.log.engine.anno.ConsumerHandler;
@@ -12,6 +12,6 @@ public class SimpleConsumerGroupHandler implements MessageHandler {
 
     @Override
     public void handler(MessageView messageView) {
-
+        System.out.println("simpleConsumer消费消息:" + messageView.getMessageId());
     }
 }

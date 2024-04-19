@@ -6,7 +6,15 @@ package com.game.log.engine.conf;
  */
 public class MqConst {
 
-    public static final String CONSUMER_SIMPLE = "simple";
+    public static final String CONSUMER_SIMPLE = "SIMPLE";
 
-    public static final String CONSUMER_PUSH = "push";
+    public static final String CONSUMER_PUSH = "PUSH";
+
+    public static final String MESSAGE_TYPE_COMMENT = "COMMENT";
+
+    public static final String MESSAGE_TYPE_TRANSACTION = "TRANSACTION";
+
+    public static final String MESSAGE_TYPE_FIFO = "FIFO";
+
+    public static final String MESSAGE_TYPE_DELAY = "DELAY";
 }

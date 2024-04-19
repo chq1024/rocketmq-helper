@@ -1,5 +1,6 @@
 package com.game.log.engine.conf;
 
+import com.game.log.engine.utils.CacheUtil;
 import lombok.Getter;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 @Getter
 public enum LogTableEnum {
 
-    GACHA_CARD_LOG(1,"log_comment_topic","log_gacha_card_tb"),
+    GACHA_CARD_LOG(1,"log_transaction_topic","log_gacha_card_tb"),
     USE_ITEM_LOG(2,"log_comment_topic","log_use_item_tb"),
     ;
     private int idx;
@@ -24,7 +25,7 @@ public enum LogTableEnum {
         this.tbName = tbName;
     }
 
-
+    // 顺序消息需要设置消息组
     public String messageGroup() {
         int idx = this.getIdx();
         int remi = idx % 3;
@@ -37,12 +38,19 @@ public enum LogTableEnum {
         }
     }
 
+    // 获取当前消息类型
+    public String messageType() {
+        String currTopic = this.getTopic();
+        String mt = CacheUtil.getTmtCache(currTopic);
+        return mt.toUpperCase();
+    }
+
     public MqMessage mqMessage(Map<String,Object> content) {
-        return MqMessage.builder()
-                .topic(this.getTopic())
-                .tb(this.getTbName())
-                .messageGroup(this.messageGroup())
-                .content(content)
-                .build();
+        MqMessage.MqMessageBuilder builder = MqMessage.builder().topic(this.getTopic()).tb(this.getTbName()).content(content);
+        String mt = messageType();
+        if (MqConst.MESSAGE_TYPE_FIFO.equals(mt)) {
+            builder.messageGroup(messageGroup());
+        }
+        return builder.build();
     }
 }

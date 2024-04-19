@@ -3,15 +3,12 @@ package com.game.log.engine.ab.factory;
 import com.game.log.engine.ab.AbFactory;
 import com.game.log.engine.conf.MqMessage;
 import com.game.log.engine.conf.MqProperties;
-import com.game.log.engine.utils.TransformUtil;
 import org.apache.rocketmq.client.apis.ClientConfiguration;
 import org.apache.rocketmq.client.apis.ClientException;
 import org.apache.rocketmq.client.apis.ClientServiceProvider;
-import org.apache.rocketmq.client.apis.message.MessageBuilder;
 import org.apache.rocketmq.client.apis.producer.Producer;
 import org.apache.rocketmq.client.apis.producer.ProducerBuilder;
 import org.apache.rocketmq.client.apis.producer.TransactionChecker;
-import org.apache.rocketmq.client.java.message.MessageBuilderImpl;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 

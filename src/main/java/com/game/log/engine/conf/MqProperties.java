@@ -17,6 +17,8 @@ import java.util.Map;
 public class MqProperties {
 
     private String proxy;
+    private String nameAddr;
+    private String clusterName;
     private Boolean enableSsl;
     private ProducerProperties producer;
     private Map<String,ConsumerProperties> consumers;
@@ -52,6 +54,7 @@ public class MqProperties {
 
         public ConsumerProperties() {
             this.threadNum = 3;
+            this.receiveNum = 10;
             this.messageCount = 1024;
             this.messageSize = 64 * 1024 * 1024;
             this.awaitSeconds = 5;
@@ -62,10 +65,12 @@ public class MqProperties {
 
     @Data
     public static class TopicProperties {
-        private Boolean isTrans;
+        private String type;
+        private Boolean order;
 
         public TopicProperties() {
-            this.isTrans = false;
+            this.type = MqConst.MESSAGE_TYPE_COMMENT;
+            this.order = false;
         }
     }
 }

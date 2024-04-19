@@ -53,14 +53,14 @@ public class PushConsumerFactory extends AbFactory<PushConsumer> {
             for (Map.Entry<String, MqProperties.ConsumerProperties> config : consumers.entrySet()) {
                 String consumerGroupName = config.getKey();
                 MqProperties.ConsumerProperties consumerConfig = config.getValue();
-                if (!MqConst.CONSUMER_PUSH.equals(consumerConfig.getType())) {
+                if (!MqConst.CONSUMER_PUSH.equalsIgnoreCase(consumerConfig.getType())) {
                     continue;
                 }
 
                 PushConsumer pushConsumer = provider.newPushConsumerBuilder()
                         .setClientConfiguration(configuration)
                         .setConsumerGroup(consumerGroupName)
-                        .setMessageListener(MessageListenerFactory.instance().get(consumerGroupName))
+                        .setMessageListener(MessageFactory.listener().get(consumerGroupName))
                         .setConsumptionThreadCount(consumerConfig.getThreadNum())
                         .setMaxCacheMessageCount(consumerConfig.getMessageCount())
                         .setMaxCacheMessageSizeInBytes(consumerConfig.getMessageSize())

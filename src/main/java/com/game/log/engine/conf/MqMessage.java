@@ -81,7 +81,6 @@ public class MqMessage implements Serializable{
         bodyMap.put("od",msgID);
         bodyMap.put("retry",Optional.ofNullable(this.retry).orElse(0));
         messageBuilder.setBody(TransformUtil.toByteArray(bodyMap));
-
         return messageBuilder.build();
     }
 }
